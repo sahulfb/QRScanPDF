@@ -1,0 +1,113 @@
+@use 'base/variables' as v;
+@use 'base/mixins' as m;
+
+.resultados{
+    text-align: center;
+    width: 90%;
+    margin: 5rem auto 5rem auto;
+    padding: .5rem 1rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    &__contenedor{
+        margin: 1rem auto;
+        box-shadow: 0 3px 7px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.6%;
+        background: #F4FAFF;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    &__items{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        flex-direction: column;
+    }
+
+    &__qr{
+        padding: 1rem;
+        img{
+            width: 12rem;
+            height: 12rem;
+        }
+    }
+
+    &__titulo{
+        margin: 0;
+        font-size: 1.8rem;
+        width: 100%;
+        margin-top:1rem;
+        text-transform: capitalize;
+    }
+
+    &__descripcion{
+    width: 25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    padding-bottom: 1rem;
+    }
+}
+
+.resultado{
+    &__item{
+        label{
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: v.$bold;
+        }
+        input{
+            all: unset;
+          text-align: center;
+            font-size: 1.6rem;
+        }
+    }
+}
+
+.titulo-resultado{
+    margin-top:10rem;
+    text-transform: uppercase;
+}
+
+@include m.tablet {
+    .resultados{
+           grid-template-columns: repeat(2, 1fr);
+           gap: 4rem;
+
+           &__items{
+               flex-direction: row;
+           }
+
+           &__descripcion{
+            width: 100%;
+            align-items: flex-start;
+            }
+    }
+}
+
+@include m.desktop {
+    .resultados__titulo{
+        text-align: left;
+    }
+    .resultado__item{
+        input{
+            text-align: left;
+          }
+
+          label{
+            width: 8rem;
+            text-align: left;
+         }
+    }
+    
+}
+
+//ocultar Resultados
+.resultados-escaner{
+    display: none;
+}

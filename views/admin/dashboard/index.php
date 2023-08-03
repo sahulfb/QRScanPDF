@@ -26,5 +26,10 @@
             <div class="list"></div>
             <button class="btn__escanear">Escanear</button>
         </div>
-    </div>
 </main>
+
+<div class="resultados-escaner">
+    <h2 class="titulo-resultado">Resultados</h2>
+    <div class="resultados">
+    </div>
+</div>

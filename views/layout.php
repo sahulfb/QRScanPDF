@@ -20,6 +20,9 @@
     echo $contenido;
     include_once __DIR__ . '/templates/footer.php';
     ?>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js" integrity="sha512-U5C477Z8VvmbYAoV4HDq17tf4wG6HXPC6/KM9+0/wEXQQ13gmKY2Zb0Z2vu0VNUWch4GlJ+Tl/dfoLOH4i2msw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js" integrity="sha512-Vkfgjy7zVth/uhXHLkHeGDXPBY63Xce+GY8T9EH/xXA+WkWgbr3F3rQyZ/zmBEj7PyYu0etJgRakVnLJYGJngg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cozmo.github.io/jsQR/jsQR.js"></script>
     <script src="/build/js/main.min.js" defer></script>
 </body>
 
