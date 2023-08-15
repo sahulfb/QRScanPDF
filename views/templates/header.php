@@ -6,7 +6,7 @@
         <ul class="ul-header">
           <li><a>Admin</a>
           <ul class="dropdown">
-              <li><a href="panel">Panel</a></li>
+              <li class="<?php echo is_admin_panel() ? 'd-none' : ''; ?>"><a href="/admin/panel">Panel</a></li>
                 <li>
                   <a> <form method="POST" action="/logout" class="dashboard__form">
                     <input type="submit" value="Cerrar Sesión" class="dashboard__submit--logout">

@@ -56,4 +56,12 @@ class PaginasController
             'alertas' => $alertas
         ]);
     }
+
+    public static function error(Router $router)
+    {
+
+        $router->render('paginas/error', [
+            'titulo' => 'No se pudo encontrar el documento'
+        ]);
+    }
 }

@@ -34,6 +34,7 @@
     text-align: center;
     width: 100%;
     display: inline-block;
+    border-radius: 0.8rem;
 
     &:hover {
         background-color: darken( $bgColor, 10% );

@@ -10,7 +10,7 @@
 
                     <span>Arrastra y suelta los archivos aquí</span>
                     <button class="dashboard__btn-file">Seleccionar Archivo</button>
-                    <input type="file" name="file_selector" class="dashboard__input-file" accept=".pdf" multiple>
+                    <input type="file" name="files[]" class="dashboard__input-file" multiple>
                 </div>
 
                 <div class="col">
@@ -29,7 +29,10 @@
 </main>
 
 <div class="resultados-escaner">
-    <h2 class="titulo-resultado">Resultados</h2>
+    <h2 class="titulo-resultado text-center">Resultados</h2>
     <div class="resultados">
+    </div>
+    <div class="btn__guardarBD-contenedor">
+        <button class="btn__guardarBD">Guardar</button>
     </div>
 </div>

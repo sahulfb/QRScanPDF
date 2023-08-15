@@ -5,7 +5,9 @@ const fileSelector = document.querySelector('.dashboard__btn-file')
 const fileSelectorInput = document.querySelector('.dashboard__input-file')
 
 // upload files with browse button
-fileSelector.onclick = () => fileSelectorInput.click()
+if(fileSelector){
+    fileSelector.onclick = () => fileSelectorInput.click()
+
 fileSelectorInput.onchange = () => {
     listContainer.innerHTML='';
     [...fileSelectorInput.files].forEach((file) => {
@@ -14,6 +16,7 @@ fileSelectorInput.onchange = () => {
         }
     })
 }
+
 
 dropArea.ondragover = (e) => {
     e.preventDefault();
@@ -55,6 +58,7 @@ dropArea.ondrop = (e) => {
         addFilesToInput(files);
     }
 }
+}
 
 function addFilesToInput(files) {
     const newFileList = new DataTransfer();
@@ -95,7 +99,10 @@ function uploadFile(file) {
         </div>
     `;
     listContainer.prepend(li);
-    li.querySelector('.cross').onclick = () => li.remove(); // Eliminar el elemento de la lista al hacer clic en la cruz
+    cross=li.querySelector('.cross')
+    if(cross){
+        cross.onclick = () => li.remove(); // Eliminar el elemento de la lista al hacer clic en la cruz
+    }
 }
 // find icon for file
 function iconSelector(type){

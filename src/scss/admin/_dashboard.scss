@@ -2,7 +2,6 @@
 @use 'base/mixins' as m;
 
 .dashboard{
-  //  background: #f7f7f7;
     &__contenedor{
         text-align: center;
         width: 90%;
@@ -241,135 +240,90 @@
     
 }
 
-//Bloques
+//Bloques del Panel
+
+h1.dashboard__heading{
+    text-align: center;
+    margin: 2rem 0;
+    text-transform: uppercase;
+}
 
 .bloques {
    @include m.contenedor;
+   display: flex;
+justify-content: center;
+width: 80%;
+
    @include m.tablet {
-        margin-top: 10rem;
+       width: 60%;
+        margin: 5rem;
+        display: block;
+        justify-items: left;
    }
 
    &__grid {
+    margin: 0 2rem;
+    width: 100%;
        @include m.grid(1, 3rem);
        @include m.desktop {
-           @include m.grid(2, 3rem);
+           display: grid;
+           grid-template-columns: 2fr repeat(2, 1fr);
        }
    }
 }
 
-.bloque {
-    padding: 3rem;
-    color: v.$blanco;
-    border-radius: 1rem;
+.bloque{
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    &__plus{
+        background-image: linear-gradient(180deg, white, #e0e8f8);
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+        color: v.$negro;
+        display: flex;
+        align-items: center;
+        padding: 3rem;
+        gap: 3rem;
+        border-radius: .75rem;
+        cursor: pointer;
+        transition-duration: 0.5s;
+        i{
+            font-size: 2.8rem;
+        }
 
-    &:nth-child(1) {
-       @include m.bg-gradient(#F97316);
+        &:hover{
+            background-image: linear-gradient(180deg, white, #d0ddf7); 
+        }
     }
-    &:nth-child(2) {
-        @include m.bg-gradient(#A855F7);
-    }
-    &__heading {
-        margin: 1rem 0 2rem 0;
-        font-size: 3.6rem;
-    }
-    &__texto {
-        margin: 1rem 0;
 
-        &--cantidad {
-            margin-top: 5rem;
+    &__heading{
+        font-size: 1.8rem;
+    }
+
+    &__card{
+        &:nth-child(2) {
+            background: v.$azul-oscuro;
+         }
+         &:nth-child(3) {
+             background: v.$azul-oscuro;
+         }
+        padding: .5rem 3rem;
+        border-radius: .75rem;
+        text-align: center;
+        color: v.$blanco;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+        h3{
+            font-size: 1.5rem;
+            font-weight: v.$bold;
+        }
+
+        p{
+            font-size: 4rem;
             font-weight: v.$black;
-            font-size: 6rem;
-            text-align: center;
+        }
+    }
+
+    @include m.tablet {
+        &__heading{
+            font-size: 2.3rem;
         }
     }
 }
-
-/* Panel */
-
-.container {
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-top: 4rem;
-  }
-  
-  h2 {
-    font-size: 26px;
-    margin: 20px 0;
-    text-align: center;
-    small {
-      font-size: 0.5em;
-    }
-  }
-  
-  .responsive-table {
-    li {
-      border-radius: 3px;
-      padding: 25px 30px;
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 25px;
-    }
-    .table-header {
-      background-color: v.$azul-oscuro;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      color: v.$blanco;
-      text-align: center;
-    }
-    .table-row {
-      background-color: #ffffff;
-      box-shadow: 0px 0px 9px 0px rgba(0,0,0,0.1);
-    }
-    .col-1 {
-      flex-basis: 10%;
-    }
-    .col-2 {
-      flex-basis: 40%;
-    }
-    .col-3 {
-      flex-basis: 25%;
-    }
-    .col-4 {
-      flex-basis: 25%;
-    }
-    
-    @media all and (max-width: 767px) {
-      .table-header {
-        display: none;
-      }
-      li {
-        display: block;
-      }
-      .col {
-        
-        flex-basis: 100%;
-        
-      }
-      .col {
-        display: flex;
-        padding: 10px 0;
-        &:before {
-          color: #6C7A89;
-          padding-right: 10px;
-          content: attr(data-label);
-          flex-basis: 50%;
-          text-align: right;
-        }
-      }
-    }
-  }
-
-  .col.col-4.file {
-    border: 1px solid #df2020;
-      border-radius: .5rem;
-        padding: 1rem 2rem;
-        text-align: center;
-        cursor: pointer;
-        &:hover{
-            background-color: #df2020;
-            color: v.$blanco;
-        }
-  }

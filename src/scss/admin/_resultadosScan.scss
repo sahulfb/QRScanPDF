@@ -74,6 +74,40 @@
     text-transform: uppercase;
 }
 
+.text-center{
+    text-align: center;
+}
+
+.btn__guardarBD{
+    &-contenedor{
+        display: flex;
+        justify-content: center;
+    }
+
+    color: v.$blanco;
+background-color: v.$azul-oscuro;
+border: none;
+outline: none;
+padding: 2rem;
+border-radius: 0.8rem;
+margin-bottom: 2rem;
+cursor: pointer;
+box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+min-width: 20rem;
+font-size: 2.1rem;
+transition-duration: 0.2s;
+
+&:hover{
+    background-color: lighten(v.$azul-oscuro,5%);
+}
+
+&-desactivado{
+    background-color: rgb(222, 225, 229);
+    color: v.$negro;
+    pointer-events: none;
+}
+}
+
 @include m.tablet {
     .resultados{
            grid-template-columns: repeat(2, 1fr);

@@ -205,3 +205,25 @@
         }
     }
 }
+
+//Error 404
+
+.pagina_404{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    &__heading{
+        padding: 3rem 0;
+        text-transform: uppercase;
+        font-size: 2.8rem;
+    }
+    img{
+        max-width: 40rem;
+    }
+
+    a{
+        @include m.boton(v.$azul-oscuro, v.$blanco);
+    }
+}

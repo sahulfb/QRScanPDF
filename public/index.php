@@ -5,7 +5,9 @@ require_once __DIR__ . '/../includes/app.php';
 use MVC\Router;
 use Controllers\AuthController;
 use Controllers\DashboardController;
+use Controllers\GuardarDatosController;
 use Controllers\LoginController;
+use Controllers\OpenDocumentoController;
 use Controllers\PaginasController;
 
 $router = new Router();
@@ -35,5 +37,15 @@ $router->get('/confirmar-cuenta', [AuthController::class, 'confirmar']);
 // Area de administración
 $router->get('/admin/dashboard', [DashboardController::class, 'index']);
 $router->get('/admin/panel', [DashboardController::class, 'panel']);
+$router->post('/admin/panel/eliminar', [DashboardController::class, 'eliminar']);
+$router->post('/admin/panel/documento', [DashboardController::class, 'documento']);
+
+// API para Guardar Datos
+$router->post('/api/guardar', [GuardarDatosController::class, 'guardar']);
+$router->post('/api/buscar', [GuardarDatosController::class, 'buscar']);
+
+$router->get('/digital', [OpenDocumentoController::class, 'digital']);
+$router->get('/404', [PaginasController::class, 'error']);
+
 
 $router->comprobarRutas();

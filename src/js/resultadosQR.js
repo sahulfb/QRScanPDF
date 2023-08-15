@@ -1,8 +1,14 @@
+import Swal from 'sweetalert2'
+
 console.clear();
+
 const btnEscaner= document.querySelector('.btn__escanear');
 let qrDataMap = {};
 const imageUrlsArray = [];
+let documentosNoProcesados = [];
+let qrDataLista = []; 
 const fileSelectorInput = document.querySelector('.dashboard__input-file');
+let linksProcesados;
 
 function addAlphaChannelToUnit8ClampedArray(unit8Array, imageWidth, imageHeight) {
   const newImageData = new Uint8ClampedArray(imageWidth * imageHeight * 4);
@@ -35,7 +41,6 @@ const getPageImages = async (pageNum, pdfDocumentInstance) => {
       operatorList.fnArray.map(async (element, idx) => {
         if (validObjectTypes.includes(element)) {
           const imageName = operatorList.argsArray[idx][0];
-         // console.log('page', pageNum, 'imageName', imageName);
 
           const image = await pdfPage.objs.get(imageName);
           // Uint8ClampedArray
@@ -43,7 +48,7 @@ const getPageImages = async (pageNum, pdfDocumentInstance) => {
           const imageWidth = image.width;
           const imageHeight = image.height;
 
-          // imageUnit8Array contains only RGB need add alphaChanel
+          // imageUnit8Array contiene sólo RGB se le añade alphaChanel
           const imageUint8ArrayWithAlphaChanel = addAlphaChannelToUnit8ClampedArray(imageUnit8Array, imageWidth, imageHeight);
 
           const imageData = new ImageData(imageUint8ArrayWithAlphaChanel, imageWidth, imageHeight);
@@ -56,7 +61,6 @@ const getPageImages = async (pageNum, pdfDocumentInstance) => {
           canvasList.push(canvas);
 
           const decodedData = jsQR(imageUint8ArrayWithAlphaChanel, imageWidth, imageHeight);
-
           if (decodedData) {
             qrDataList.push(decodedData.data);
           }
@@ -66,7 +70,7 @@ const getPageImages = async (pageNum, pdfDocumentInstance) => {
 
     return { canvasList, qrDataList };
   } catch (error) {
-    console.log(error);
+    throw error;
     return [];
   }
 };
@@ -79,7 +83,11 @@ const processFirstPageOfPDFFiles = async (files) => {
 
   for (const file of files) {
     if (file.type !== 'application/pdf') {
-      alert(`File ${file.name} is not a PDF file type`);
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'No es un archivo PDF',
+      })
       continue;
     }
 
@@ -92,17 +100,20 @@ const processFirstPageOfPDFFiles = async (files) => {
         const loadingPdfDocument = pdfjsLib.getDocument(typedArray);
         const pdfDocumentInstance = await loadingPdfDocument.promise;
 
-        const { canvasList, qrDataList } = await getPageImages(1, pdfDocumentInstance); // Process only the first page
+        const { canvasList, qrDataList } = await getPageImages(1, pdfDocumentInstance); // Procesamos la primera página
         qrDataMap[pdfCount] = JSON.stringify(qrDataList);
         pdfCount++;
-        for (let i = 0; i < canvasList.length; i++) {
-          const canvas = canvasList[i];
-          imageUrlsArray.push(canvas.toDataURL());
+        if (qrDataList.length > 0) {
+          for (let i = 0; i < canvasList.length; i++) {
+            const canvas = canvasList[i];
+            imageUrlsArray.push(canvas.toDataURL());
+          }
+        }else{
+          documentosNoProcesados.push(file.name);
         }
         resolve();
         
       } catch (error) {
-        console.log(error);
         resolve();
       }
     };    });
@@ -114,18 +125,18 @@ const processFirstPageOfPDFFiles = async (files) => {
 
 function parseUrls(urls) {
   const parsedUrls = urls.map(url => {
-    const regex = /\/digital\/([^.]+)\.([^.]+)\.([^\/]+)/;
+    const regex = /\/digital\?data=([^\.]+)\.([^\.]+)\.(.+)/i;
     const matches = url.match(regex);
 
     if (matches && matches.length === 4) {
-      const codigo = matches[1];
-      const empresa = matches[2];
+      const folio = matches[1];
+      const empresa = matches[2].replace(/\+|%20/g, " ");
       const rut = matches[3];
 
       return {
-        Codigo: codigo,
-        Empresa: empresa,
-        Rut: rut
+        folio,
+        empresa,
+        rut,
       };
     } else {
       return {};
@@ -135,6 +146,9 @@ function parseUrls(urls) {
   return parsedUrls;
 }
 
+
+
+
 async function escanearPdf() {
   try {
     const files = fileSelectorInput.files;
@@ -142,19 +156,25 @@ async function escanearPdf() {
 
     // Obtener qrDataList de qrDataMap, analizar cada cadena JSON a un objeto
     const qrDataValues = Object.values(qrDataMap);
-    const qrDataList = qrDataValues.flatMap(JSON.parse);
-
-    if (qrDataList.length === 0) {
-      console.error("No se encontraron datos en los códigos QR.");
+    qrDataLista = qrDataValues.flatMap(JSON.parse);
+    if (qrDataLista.length === 0) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al Escanear',
+        text: 'No se encontraron datos en los códigos QR.',
+      })
       return;
+    }else{
+      //Filtrar contenido de los códigos QR
+     linksProcesados= parseUrls(qrDataLista);
     }
 
-    linksProcesados= parseUrls(qrDataList);
   } catch (error) {
-    console.error("Error al obtener o procesar el JSON:", error);
+    throw error;
   }
 }
 
+if(btnEscaner){
 btnEscaner.addEventListener('click', async() => {
     const contenidoSVG = `
     <svg width="30" height="30" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -179,42 +199,81 @@ btnEscaner.addEventListener('click', async() => {
     container.innerHTML = '';
     //espezar a escanear
   await  escanearPdf();
-     crearDivs(linksProcesados);
-  btnEscaner.textContent = '¡Completado!';
-  btnEscaner.disabled = true;
-  btnEscaner.style.backgroundColor = '#dee1e5';
-  btnEscaner.style.color = 'black';
-})
+  const nombresFinales= obtenerNombresExcluyendo(documentosNoProcesados); 
+  if (linksProcesados) {
+    let encontradoError = false;
+  
+    linksProcesados.forEach((objeto) => {
+      if (isArrayObjetoVacio(objeto)) {
+        encontradoError = true;
+      }
+    });
 
-function crearDivs(data) {
+    if (encontradoError) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al Escanear',
+        text: 'Se encontraron documentos con datos no válidos en los códigos QR.',
+      });
+      btnEscaner.textContent = 'Escanear';
+    }else{
+      crearDivs(linksProcesados,nombresFinales);
+      btnEscaner.textContent = '¡Completado!';
+      btnEscaner.disabled = true;
+      btnEscaner.style.backgroundColor = '#dee1e5';
+      btnEscaner.style.color = 'black';
+      btnGuardarBD.classList.remove('btn__guardarBD-desactivado');
+    }
+}
+})
+}
+
+function isArrayObjetoVacio(obj) {
+  return Object.keys(obj).length === 0;
+}
+
+const generateQRDataURL = (value, size, color) => {
+  const qr = new QRious({
+    value: value,
+    size: size,
+    backgroundAlpha: 1,
+    foreground: color,
+    level: "H"
+  });
+
+  return qr.toDataURL();
+};
+
+function crearDivs(data,name) {
   const container = document.querySelector('.resultados');
   document.querySelector('.resultados-escaner').style.display = 'block';
   container.innerHTML = '';
   const newArray = unirArrays(data, imageUrlsArray);
-
   newArray.forEach((objeto, i) => {
       const div = document.createElement('div');
       div.classList.add("resultados__contenedor");
+      // Generar el enlace base64 del QR
+    const qrDataURL = generateQRDataURL(qrDataLista[i], 200, "#000");
       div.innerHTML = `
       <div class="resultados__items">
       <div class="resultados__qr">
-          <img src="${objeto.Imagen}" alt="qr">
+          <img src="${qrDataURL}" alt="qr" id="codigo">
       </div>
       <div class="resultados__descripcion">
-          <h3 class="resultados__titulo">${fileSelectorInput.files[i].name}</h3>
+          <h3 class="resultados__titulo">${name[i]}</h3>
           <div class="resultado__item">
               <label>Código:</label>
-              <input type="text" class="codigo" value="${objeto.Codigo}">
+              <input type="text" class="codigo" value="${objeto.folio}">
           </div>
 
           <div class="resultado__item">
               <label>Empresa:</label>
-              <input type="text" class="empresa" value="${objeto.Empresa}">
+              <input type="text" class="empresa" value="${objeto.empresa}">
           </div>
 
           <div class="resultado__item">
               <label>RUT:</label>
-              <input type="text" class="rut" value="${objeto.Rut}">
+              <input type="text" class="rut" value="${objeto.rut}">
           </div>
       </div>
   </div>
@@ -223,11 +282,13 @@ function crearDivs(data) {
   });
 }
 
-function unirArrays(datos, imagenes) {
-  if (datos.length !== imagenes.length) {
-    throw new Error('Los arrays deben tener la misma longitud');
-  }
+function obtenerNombresExcluyendo(nombresExcluidos) {
+  const todosLosNombres = Array.from(fileSelectorInput.files, file => file.name);
+  const nombresFiltrados = todosLosNombres.filter(nombre => !nombresExcluidos.includes(nombre));
+  return nombresFiltrados;
+}
 
+function unirArrays(datos, imagenes) {
   const newArray = datos.map((item, index) => {
     return {
       ...item,
@@ -238,13 +299,15 @@ function unirArrays(datos, imagenes) {
   return newArray;
 }
 
-fileSelectorInput.addEventListener('change', () => {
+if(fileSelectorInput){
+  fileSelectorInput.addEventListener('change', () => {
     regresarBtnEstadoInicial();
 })
 
 document.querySelector('.dashboard__drag-area').addEventListener('drop', (e) => {
     regresarBtnEstadoInicial();
 });
+}
 
 function regresarBtnEstadoInicial(){
     btnEscaner.textContent = 'Escanear';
@@ -253,4 +316,53 @@ function regresarBtnEstadoInicial(){
     btnEscaner.style.color = '';
     btnEscaner.style.backgroundColor = '#122432;';
     btnEscaner.style.color = '#fff';
+}
+
+//Guardar en la base de datos
+let btnGuardarBD;
+btnGuardarBD= document.querySelector('.btn__guardarBD');
+
+if(btnGuardarBD){
+    btnGuardarBD.addEventListener('click', async function(){
+        await guardarDatos(linksProcesados);
+        btnGuardarBD.classList.add('btn__guardarBD-desactivado');
+    });
+}
+
+async function guardarDatos(datos) {
+    const jsonData = JSON.stringify(datos);
+    const fileInput = document.querySelector('input[type="file"]');
+    // Crea un objeto FormData y agrega el archivo y los datos JSON
+const formData = new FormData();
+[...fileInput.files].forEach((file, index) => {
+    formData.append('files[' + index + ']', file);
+});
+formData.append('json', jsonData);
+formData.append('nombresExcluidos', JSON.stringify(documentosNoProcesados));
+    try {
+        const url = '/api/guardar';
+        const respuesta = await fetch(url, {
+            method: 'POST',
+            body: formData
+        });
+
+        const resultado = await respuesta.json();
+        if (Object.keys(resultado).length > 0) {
+        const erroresList = resultado.map(error => `<li>${error}</li>`).join('');
+        Swal.fire({
+            title: 'Errores',
+            icon: 'error',
+            html: `<ul>${erroresList}</ul>`
+          });
+        } else {
+
+        Swal.fire({
+            title: 'Datos guardados',
+            icon: 'success'
+          });
+        }
+
+    } catch (error) {
+        throw error;
+    }
 }
